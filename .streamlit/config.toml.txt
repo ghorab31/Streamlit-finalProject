@@ -1,16 +1,10 @@
 [theme]
-primaryColor = "#F39C12"
-font = "sans serif"
-
-# Leave these out so Streamlit auto-adjusts colors:
-# backgroundColor
-# secondaryBackgroundColor
-# textColor
-# base
+primaryColor = "#F39C12"      
+font = "sans serif"            
 
 [client]
-displayTheme = "auto"
-allowCustomTheme = true
+displayTheme = "auto"          
+allowCustomTheme = true        
 
 [browser]
 gatherUsageStats = false
