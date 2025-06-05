@@ -202,7 +202,7 @@ if page=='HomePage':
     #are tv shows becming more common than movies?
 
     typeandyear=df_filtered.groupby(['type','year_added'])['show_id'].count().reset_index()#could do it with value_counts as well !
-    type_year=px.line(data_frame=typeandyear,y='show_id',x='year_added',color='type',line_group='type',title='Are TV shows becoming more common than movies?',color_discrete_map={'Movie':'red','TV Show':'white'})
+    type_year=px.line(data_frame=typeandyear,y='show_id',x='year_added',color='type',line_group='type',title='Are TV shows becoming more common than movies?',color_discrete_map={'Movie':'red','TV Show':'black'})
     type_year.update_layout(yaxis=dict(title='Count of shows/movies',title_font=dict(size=20)))
     type_year.update_layout(legend=dict(font=dict( size=16)))
     type_year.update_layout(title={'text':'<b>Are TV shows becoming more common than movies?</b>','x': 0.1,'font':{'size':20}})
