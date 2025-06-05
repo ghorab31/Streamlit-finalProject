@@ -4,6 +4,17 @@ import plotly.express as px
 import re
 import base64
 ## Reading files
+st.markdown(
+    """
+    <style>
+    body {
+        background-color: black;
+        color: white;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 df=pd.read_csv('netflix_titles.csv')
 with open("channels4_profile.jpg", "rb") as image_file:
     encoded = base64.b64encode(image_file.read()).decode()
