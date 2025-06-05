@@ -206,6 +206,14 @@ if page=='HomePage':
     type_year.update_layout(yaxis=dict(title='Count of shows/movies',title_font=dict(size=20)))
     type_year.update_layout(legend=dict(font=dict( size=16)))
     type_year.update_layout(title={'text':'<b>Are TV shows becoming more common than movies?</b>','x': 0.1,'font':{'size':20}})
+    type_year.update_layout(plot_bgcolor='black',paper_bgcolor='black',font=dict(color='white'),
+    title={'text':'<b>Are TV shows becoming more common than movies?</b>', 'x':0.1, 'font': {'size':20, 'color':'white'}}, legend=dict(font=dict(color='white')), yaxis=dict(title='Count of shows/movies', title_font=dict(size=20, color='white'), tickfont=dict(color='white')), xaxis=dict(tickfont=dict(color='white')))
+# Explicitly update trace colors without lambda
+    for trace in type_year.data:
+        if trace.name == 'TV Show':
+            trace.line.color = 'white'
+        elif trace.name == 'Movie':
+            trace.line.color = 'red'
     st.plotly_chart(figy)
     st.plotly_chart(type_year)
 #creating second page movies 
