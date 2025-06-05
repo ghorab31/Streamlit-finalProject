@@ -5,7 +5,7 @@ import re
 import base64
 ## Reading files
 df=pd.read_csv('netflix_titles.csv')
-with open(r"D:/final project spislon/netfex/channels4_profile.jpg", "rb") as image_file:
+with open("images/channels4_profile.jpg", "rb") as image_file:
     encoded = base64.b64encode(image_file.read()).decode()
 ## Adding picture
 st.markdown(
