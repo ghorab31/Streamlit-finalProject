@@ -1,0 +1,109 @@
+director
+cast
+country
+
+replace
+
+
+nans in date added
+rating added
+duration
+ 1. Data Cleaning Opportunities
+Here are a few things to clean or preprocess:
+
+Missing values:
+
+director, cast, country, and date_added have NaNs.
+
+You can fill with 'Unknown' or drop, depending on your goals.
+
+Date parsing:
+
+Convert date_added to datetime format.
+
+python
+Copy
+Edit
+df['date_added'] = pd.to_datetime(df['date_added'])
+Duration:
+
+Mixed format: "90 min" (for Movies) and "2 Seasons" (for TV Shows).
+
+Extract numbers and create new columns: duration_int, duration_type.
+
+Country and genres:
+
+These are multi-valued strings. You can:
+
+Split into lists
+
+Extract top N genres/countries
+
+Count how many per row
+
+✨ 2. Feature Engineering Ideas
+New columns you can add:
+
+year_added and month_added from date_added
+
+duration_int: numeric duration (minutes or seasons)
+
+duration_type: 'min' or 'season'
+
+main_genre: first genre in listed_in
+
+num_actors: number of actors in cast
+
+📊 3. Interesting Questions You Can Answer
+You can build your project around questions like:
+
+🎥 Content Analysis
+How does Netflix's movie vs TV show distribution look?
+
+What are the most common genres?
+
+What are the top countries producing Netflix content?
+
+⏳ Time Trends
+How has Netflix's content volume changed over time?
+
+How many titles were added each year?
+
+Are TV shows becoming more common than movies?
+
+🌎 Regional Focus
+Which countries are contributing the most content?
+
+What are the top genres by country?
+
+🔞 Age Ratings
+What are the most common Netflix ratings (TV-MA, PG-13, etc)?
+
+How do movie ratings compare to TV shows?
+
+🧠 Advanced Ideas
+Most common director or actor?
+
+Find duplicate shows with the same title but different release years.
+
+Use NLP (text analysis) on the description column to cluster titles.
+
+🛠️ Tools & Visuals (if using Power BI or Python):
+Bar plots for genre, country, rating
+
+Time series of content addition
+
+Pie charts for type distribution
+
+Word clouds from description
+
+Filters by type, country, or year
+
+💡 Final Touch for Your Report
+Add a summary page answering:
+
+“What kind of content does Netflix have?”
+
+“How has their content evolved?”
+
+“What genres or countries dominate?”
