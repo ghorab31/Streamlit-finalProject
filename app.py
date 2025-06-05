@@ -3,43 +3,8 @@ import streamlit as st
 import plotly.express as px
 import re
 import base64
+
 ## Reading files
-st.markdown(
-    """
-    <style>
-    /* Overall background */
-    .main, .block-container, .reportview-container {
-        background-color: black !important;
-        color: white !important;
-    }
-    /* Sidebar background */
-    .css-1d391kg, .css-1v3fvcr, .css-1v0mbdj {
-        background-color: black !important;
-        color: white !important;
-    }
-    /* Text colors inside */
-    .css-1d391kg * , .css-1v3fvcr *, .css-1v0mbdj * {
-        color: white !important;
-    }
-    /* For headers and markdown */
-    h1, h2, h3, h4, h5, h6, p, label, span, div {
-        color: white !important;
-    }
-    /* Remove default white backgrounds on inputs */
-    .stTextInput>div>div>input, .stTextArea>div>textarea {
-        background-color: #222 !important;
-        color: white !important;
-    }
-    /* Buttons */
-    button, .stButton>button {
-        background-color: #333 !important;
-        color: white !important;
-        border: 1px solid white !important;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
 df=pd.read_csv('netflix_titles.csv')
 with open("channels4_profile.jpg", "rb") as image_file:
     encoded = base64.b64encode(image_file.read()).decode()
@@ -113,8 +78,7 @@ if page=='HomePage':
     totalnumberofyears= int(max(df['year_added'])-min(df['year_added']))
     totalnumberofcast=dropped.groupby('cast')['count_cast'].sum().reset_index()
     actorscount=totalnumberofcast.count_cast.sum()
-
-# Display dynamic cards
+    # Display dynamic cards
     col1, col2,col3 = st.columns(3)
     col1.metric("Total Number of Shows/movies🎬📺", f"{countofcontent}")
     col2.metric("Total Number of Years⏳", f"{totalnumberofyears}")
@@ -153,77 +117,94 @@ if page=='HomePage':
     # showing DF for all DATA
     st.subheader('Whole Data')
     st.dataframe(df_filtered)
-    # chart showing  Netflix Distrubuition movies VS shows
+    df_filtered['year_added'] = df_filtered.date_added.dt.year
+    yearadded = df_filtered.groupby('year_added')['show_id'].count().reset_index()
+    user_theme = st.get_option("theme.base")
+    if user_theme == 'light':
+        font_color = 'black'
+        bg_color = 'white'
+        bar_color = 'red'
+        line_color = 'red'
+        pie_colors = {'Movie': 'red', 'TV Show': '#000000'}  # black for TV Show
+        grid_color = '#ddd'
+        type_colors = {'Movie': 'red', 'TV Show': 'black'}
+        legend_style = dict(
+            font=dict(color=font_color, family='Arial', size=14),
+            bgcolor=bg_color,
+            bordercolor=font_color,
+            borderwidth=1)
+        title_fonnt = dict(size=20, color=font_color, family='Arial', weight='bold')
 
-    fig_type = px.pie(distrubuttion, names='type', values='show_id', title='Netflix Distribution: Movies vs Shows',color_discrete_map = {'Movie': 'red', 'TV Show': '#000000'},color='type') # solid black
-    fig_type.update_layout(title={'text': 'Netflix Distribution: Movies vs Shows', 'x': 0.2,'font': {'size': 20, 'color': 'white','family': 'Arial','weight': 'bold' }})
-    fig_type.update_traces(textfont=dict(family='Arial', size=14, color='white'),textinfo='label+percent+value') 
-    st.plotly_chart(fig_type)
-    # 10 top common genre
-    genres=df.groupby('category')['show_id'].count().reset_index().head()
-    genres.sort_values(by='show_id',ascending=False,inplace=True)
-    fig = px.bar(genres,x='category',y='show_id',title='10 Top  Common  Genre',text_auto=True, color_discrete_sequence=['red'])
-    fig.update_layout(yaxis_title='Count of genre')
-    fig.update_layout(title={'x': 0.3, 'font': {'size': 20, 'color': 'white', 'family': 'Arial','weight':'bold'}},)
-    fig.update_layout(xaxis_title={'text': 'category','font': {'size': 14,'color': 'white','family': 'Arial','weight': 'bold'}})
-    fig.update_layout(yaxis_title={'text': 'Count of genre','font': {'size': 14,'color': 'white','family': 'Arial','weight': 'bold'}})
-    fig.update_yaxes(tickfont=dict(family='arial',weight='bold',size=14))
-    fig.update_xaxes(tickfont=dict(family='arial',weight='bold',size=14))
-    st.plotly_chart(fig)
-    #top countries producing netflix content
+    else:
+        font_color = 'white'
+        bg_color = '#111111'
+        line_color = 'red'
+        bar_color = 'red'
+        pie_colors = {'Movie': 'red', 'TV Show': 'white'}
+        grid_color = '#444'
+        type_colors = {'Movie': 'red', 'TV Show': 'white'}
+        legend_style = dict(
+            font=dict(color=font_color, family='Arial', size=14),
+            bgcolor=bg_color,
+            bordercolor=font_color,
+            borderwidth=1)
+        title_fonnt= dict(size=20, color=font_color, family='Arial', weight='bold')
 
+    # Pie chart showing Distrubution
+    fig_type = px.pie(distrubuttion,names='type',values='show_id',title='Netflix Distribution: Movies vs Shows',color_discrete_map=pie_colors,color='type')
+    fig_type.update_layout(plot_bgcolor=bg_color,paper_bgcolor=bg_color,title={'text': 'Netflix Distribution: Movies vs Shows','x': 0.2,'font': {'size': 20, 'color': font_color, 'family': 'Arial'}},    font=dict(color=font_color, family='Arial'),legend=legend_style)
+    fig_type.update_traces(textfont=dict(family='Arial', size=14, color=font_color), textinfo='label+percent+value')
+    st.plotly_chart(fig_type, use_container_width=True)
+
+    # Top 10 common genres bar chart
+    genres = df.groupby('category')['show_id'].count().reset_index()
+    genres.sort_values(by='show_id', ascending=False, inplace=True)
+    top_genres = genres.head(10)
+    fig_genres = px.bar(top_genres,x='category',y='show_id',title='10 Top Common Genres',text_auto=True,color_discrete_sequence=[bar_color])
+    fig_genres.update_layout(plot_bgcolor=bg_color,paper_bgcolor=bg_color,yaxis_title='Count of genre',xaxis_title='Category',title={'x': 0.3, 'font': {'size': 20, 'color': font_color, 'family': 'Arial'}},font=dict(color=font_color, family='Arial'))
+    fig_genres.update_xaxes(tickfont=dict(family='Arial', size=14, color=font_color))
+    fig_genres.update_yaxes(tickfont=dict(family='Arial', size=14, color=font_color))
+    st.plotly_chart(fig_genres, use_container_width=True)
+
+    # Top countries producing Netflix content bar chart
     countries = df.groupby('new')['show_id'].count().reset_index()
     countries.sort_values(by='show_id', ascending=False, inplace=True)
-    countries = countries.head(10)
-    figc = px.bar(data_frame=countries,x='new',y='show_id',title='What are the top countries producing Netflix content?',text_auto=True, color_discrete_sequence=['red'])
-    figc.update_layout(yaxis_title='Count of country')
-    figc.update_layout(xaxis_title='Country Name')
-    figc.update_layout(title={'x': 0.2, 'font': {'size': 20, 'color': 'white', 'family': 'Arial','weight':'bold'}},)
-    figc.update_layout(xaxis_title={'text': 'Country Name','font': {'size': 14,'color': 'white','family': 'Arial','weight': 'bold'}})
-    figc.update_layout(yaxis_title={'text': 'Count of country','font': {'size': 14,'color': 'white','family': 'Arial','weight': 'bold'}})
-    figc.update_yaxes(tickfont=dict(family='arial',weight='bold',size=14))
-    figc.update_xaxes(tickfont=dict(family='arial',weight='bold',size=14))
-    st.plotly_chart(figc)
+    top_countries = countries.head(10)
+    fig_countries = px.bar(top_countries,x='new',y='show_id',title='What are the top countries producing Netflix content?',text_auto=True,color_discrete_sequence=[bar_color])
+    fig_countries.update_layout(plot_bgcolor=bg_color,paper_bgcolor=bg_color,yaxis_title='Count of content',xaxis_title='Country Name',title={'x': 0.2, 'font': {'size': 20, 'color': font_color, 'family': 'Arial'}},font=dict(color=font_color, family='Arial'),xaxis=dict(tickfont=dict(family='Arial', size=14, color=font_color)),yaxis=dict(tickfont=dict(family='Arial', size=14, color=font_color)))
+    st.plotly_chart(fig_countries, use_container_width=True)
+    # total content volume over years
 
-    #how has netflix's content volume change overtime 
-
-    df_filtered['year_added']=df_filtered.date_added.dt.year
-    yearadded=df_filtered.groupby('year_added')['show_id'].count().reset_index()
-    figy=px.line(data_frame=yearadded,x='year_added',y='show_id',color_discrete_sequence=['red'],title="How has Netflix's content volume changed over time?")
-    figy.update_xaxes(tickmode='linear')
-    figy.update_layout(yaxis_title='Years_added')
-    figy.update_layout(xaxis_title='count of content')
-    figy.update_layout(title={'x': 0.2, 'font': {'size': 20, 'color': 'white', 'family': 'Arial','weight':'bold'}},)
-    figy.update_layout(xaxis_title={'text': 'Years_added','font': {'size': 14,'color': 'white','family': 'Arial','weight': 'bold'}})
-    figy.update_layout(yaxis_title={'text': 'count of','font': {'size': 14,'color': 'white','family': 'Arial','weight': 'bold'}})
-    figy.update_yaxes(tickfont=dict(family='arial',weight='bold',size=14))
-    figy.update_xaxes(tickfont=dict(family='arial',weight='bold',size=14))
-    st.plotly_chart(figy)
-    #are tv shows becming more common than movies?
+    figy = px.line(data_frame=yearadded,x='year_added',y='show_id',title="How has Netflix's content volume changed over time?",color_discrete_sequence=[line_color])
+    figy.update_layout(plot_bgcolor=bg_color,paper_bgcolor=bg_color,font=dict(color=font_color, family='Arial', size=14),title=dict(font=dict(size=20, color=font_color, family='Arial',), x=0.2),xaxis=dict(title='Year Added',tickmode='linear',tickfont=dict(family='Arial', size=14, color=font_color),gridcolor=grid_color),yaxis=dict(title='Count of Content',tickfont=dict(family='Arial', size=14, color=font_color),gridcolor=grid_color))
+    st.plotly_chart(figy, use_container_width=True)
+    # content count by type over years
 
     typeandyear = df_filtered.groupby(['type', 'year_added'])['show_id'].count().reset_index()
+    type_year = px.line(data_frame=typeandyear,x='year_added',y='show_id',color='type',title='Are TV shows becoming more common than movies?',color_discrete_map=type_colors)
 
-# Detect Streamlit theme
+    type_year.update_layout(
+        width=1000,
+        plot_bgcolor=bg_color,
+        paper_bgcolor=bg_color,
+        font=dict(color=font_color, family='Arial', size=14),
+        title=dict(text='Are TV shows becoming more common than movies?', x=0.3, font=dict(color=font_color, family='Arial', size=18)),
+        legend=legend_style,
+        xaxis=dict(
+            title='Year Added',
+            tickfont=dict(color=font_color, family='Arial', size=14),
+            title_font=title_fonnt,
+            gridcolor=grid_color,
+            tickmode='linear'
+        ),
+        yaxis=dict(
+            title='Count of Content',
+            tickfont=dict(color=font_color, family='Arial', size=14),
+            title_font=title_fonnt,
+            gridcolor=grid_color ))
 
-# Detect Streamlit theme
-    user_theme = st.get_option("theme.base")
-    if user_theme == 'white':
-        line_colors = {'Movie': 'red', 'TV Show': 'black'}
-        font_color = 'black'
-        grid_color = '#444'  # Slightly lighter than black
-    else:
-        line_colors = {'Movie': 'red', 'TV Show': 'white'}
-        font_color = 'white'
-        grid_color = '#ccc'
-    # Create line chart
-    type_year = px.line(
-        data_frame=typeandyear,y='show_id',x='year_added',color='type',line_group='type',title='Are TV shows becoming more common than movies?',color_discrete_map=line_colors)
-    # Update layout with theme-aware styling
-    type_year.update_layout(width=1000, font=dict(color=font_color), title=dict(text='Are TV shows becoming more common than movies?', x=0.3, font=dict(color=font_color)), legend=dict(font=dict(color=font_color)), xaxis=dict(tickfont=dict(color=font_color), title_font=dict(color=font_color), gridcolor=grid_color), yaxis=dict(tickfont=dict(color=font_color), title_font=dict(color=font_color), gridcolor=grid_color))
     st.plotly_chart(type_year, use_container_width=True)
-
-#creating second page movies 
-
+    #creating second page movies 
 if page == 'Movies':
     #creating base DF
     base_moviefilter = df_filtered[df_filtered.type == 'Movie'].drop_duplicates(subset=['cast'])
