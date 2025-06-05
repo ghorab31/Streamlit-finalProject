@@ -198,24 +198,30 @@ if page=='HomePage':
     figy.update_layout(yaxis_title={'text': 'count of','font': {'size': 14,'color': 'white','family': 'Arial','weight': 'bold'}})
     figy.update_yaxes(tickfont=dict(family='arial',weight='bold',size=14))
     figy.update_xaxes(tickfont=dict(family='arial',weight='bold',size=14))
-
+    st.plotly_chart(figy)
     #are tv shows becming more common than movies?
 
-    typeandyear=df_filtered.groupby(['type','year_added'])['show_id'].count().reset_index()#could do it with value_counts as well !
-    type_year=px.line(data_frame=typeandyear,y='show_id',x='year_added',color='type',line_group='type',title='Are TV shows becoming more common than movies?',color_discrete_map={'Movie':'red','TV Show':'black'})
-    type_year.update_layout(yaxis=dict(title='Count of shows/movies',title_font=dict(size=20)))
-    type_year.update_layout(legend=dict(font=dict( size=16)))
-    type_year.update_layout(title={'text':'<b>Are TV shows becoming more common than movies?</b>','x': 0.1,'font':{'size':20}})
-    type_year.update_layout(plot_bgcolor='black',paper_bgcolor='black',font=dict(color='white'),
-    title={'text':'<b>Are TV shows becoming more common than movies?</b>', 'x':0.1, 'font': {'size':20, 'color':'white'}}, legend=dict(font=dict(color='white')), yaxis=dict(title='Count of shows/movies', title_font=dict(size=20, color='white'), tickfont=dict(color='white')), xaxis=dict(tickfont=dict(color='white')))
-# Explicitly update trace colors without lambda
-    for trace in type_year.data:
-        if trace.name == 'TV Show':
-            trace.line.color = 'white'
-        elif trace.name == 'Movie':
-            trace.line.color = 'red'
-    st.plotly_chart(figy)
-    st.plotly_chart(type_year)
+    typeandyear = df_filtered.groupby(['type', 'year_added'])['show_id'].count().reset_index()
+
+# Detect Streamlit theme
+
+# Detect Streamlit theme
+    user_theme = st.get_option("theme.base")
+    if user_theme == 'white':
+        line_colors = {'Movie': 'red', 'TV Show': 'black'}
+        font_color = 'black'
+        grid_color = '#444'  # Slightly lighter than black
+    else:
+        line_colors = {'Movie': 'red', 'TV Show': 'white'}
+        font_color = 'white'
+        grid_color = '#ccc'
+    # Create line chart
+    type_year = px.line(
+        data_frame=typeandyear,y='show_id',x='year_added',color='type',line_group='type',title='Are TV shows becoming more common than movies?',color_discrete_map=line_colors)
+    # Update layout with theme-aware styling
+    type_year.update_layout(width=1000, font=dict(color=font_color), title=dict(text='Are TV shows becoming more common than movies?', x=0.3, font=dict(color=font_color)), legend=dict(font=dict(color=font_color)), xaxis=dict(tickfont=dict(color=font_color), title_font=dict(color=font_color), gridcolor=grid_color), yaxis=dict(tickfont=dict(color=font_color), title_font=dict(color=font_color), gridcolor=grid_color))
+    st.plotly_chart(type_year, use_container_width=True)
+
 #creating second page movies 
 
 if page == 'Movies':
