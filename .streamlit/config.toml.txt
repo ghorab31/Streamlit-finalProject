@@ -1,14 +1,16 @@
 [theme]
-base = "dark"
 primaryColor = "#F39C12"
-backgroundColor = "#0E1117"
-secondaryBackgroundColor = "#262730"
-textColor = "#FAFAFA"
 font = "sans serif"
 
+# Leave these out so Streamlit auto-adjusts colors:
+# backgroundColor
+# secondaryBackgroundColor
+# textColor
+# base
+
 [client]
-displayTheme = "dark"
-allowCustomTheme = false
+displayTheme = "auto"
+allowCustomTheme = true
 
 [browser]
 gatherUsageStats = false
