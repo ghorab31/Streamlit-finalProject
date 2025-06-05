@@ -7,9 +7,34 @@ import base64
 st.markdown(
     """
     <style>
-    body {
-        background-color: black;
-        color: white;
+    /* Overall background */
+    .main, .block-container, .reportview-container {
+        background-color: black !important;
+        color: white !important;
+    }
+    /* Sidebar background */
+    .css-1d391kg, .css-1v3fvcr, .css-1v0mbdj {
+        background-color: black !important;
+        color: white !important;
+    }
+    /* Text colors inside */
+    .css-1d391kg * , .css-1v3fvcr *, .css-1v0mbdj * {
+        color: white !important;
+    }
+    /* For headers and markdown */
+    h1, h2, h3, h4, h5, h6, p, label, span, div {
+        color: white !important;
+    }
+    /* Remove default white backgrounds on inputs */
+    .stTextInput>div>div>input, .stTextArea>div>textarea {
+        background-color: #222 !important;
+        color: white !important;
+    }
+    /* Buttons */
+    button, .stButton>button {
+        background-color: #333 !important;
+        color: white !important;
+        border: 1px solid white !important;
     }
     </style>
     """,
