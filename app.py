@@ -28,6 +28,9 @@ start_date=st.sidebar.date_input("DateAdded", value=min_date,min_value=min_date,
 end_Date=st.sidebar.date_input("EndDate", value=max_date,min_value=min_date,max_value=max_date)
 # setting different pages
 page=st.sidebar.radio('Pages',['HomePage','Movies','Series'])
+rating_list = df['rating'].dropna().unique()
+selected_ratings = st.sidebar.multiselect("Select Rating(s)", sorted(rating_list), default=rating_list)
+
 # Data cleaning and feature engineering
 
 df.release_year=df.release_year.astype(object)
@@ -69,13 +72,14 @@ df['count_cast'] = df['cast'].apply(count_cast)
 df['number_ofseasons']=df.number_ofseasons.fillna(0)
 df['movies_minutes']=df.movies_minutes.fillna(0)
 df_filtered=df[(df.date_added>=str(start_date))&(df.date_added<=str(end_Date))]
+df_filtered= df_filtered[df_filtered['rating'].isin(selected_ratings)]
 distrubuttion=df_filtered.groupby('type')['show_id'].count().reset_index()#could do it with value_counts as well !
 distrubuttion.type=distrubuttion.type.str.strip()
 # creating Pages 
 if page=='HomePage':
-    dropped=df.drop_duplicates(subset=['cast'])
+    dropped=df_filtered.drop_duplicates(subset=['cast'])
     countofcontent = dropped['show_id'].drop_duplicates().count() # calculating measure for cards
-    totalnumberofyears= int(max(df['year_added'])-min(df['year_added']))
+    totalnumberofyears= int(max(df_filtered['year_added'])-min(df_filtered['year_added']))
     totalnumberofcast=dropped.groupby('cast')['count_cast'].sum().reset_index()
     actorscount=totalnumberofcast.count_cast.sum()
     # Display dynamic cards
@@ -153,7 +157,7 @@ if page=='HomePage':
     # Pie chart showing Distrubution
     fig_type = px.pie(distrubuttion,names='type',values='show_id',title='Netflix Distribution: Movies vs Shows',color_discrete_map=pie_colors,color='type')
     fig_type.update_layout(plot_bgcolor=bg_color,paper_bgcolor=bg_color,title={'text': 'Netflix Distribution: Movies vs Shows','x': 0.2,'font': {'size': 20, 'color': font_color, 'family': 'Arial'}},    font=dict(color=font_color, family='Arial'),legend=legend_style)
-    fig_type.update_traces(textfont=dict(family='Arial', size=14, color=font_color), textinfo='label+percent+value')
+    fig_type.update_traces(textfont=dict(family='Arial', size=14, color='black'), textinfo='label+percent+value')
     st.plotly_chart(fig_type, use_container_width=True)
 
     # Top 10 common genres bar chart
@@ -195,15 +199,20 @@ if page=='HomePage':
             tickfont=dict(color=font_color, family='Arial', size=14),
             title_font=title_fonnt,
             gridcolor=grid_color,
-            tickmode='linear'
-        ),
-        yaxis=dict(
-            title='Count of Content',
+            tickmode='linear'),yaxis=dict(title='Count of Content',
             tickfont=dict(color=font_color, family='Arial', size=14),
             title_font=title_fonnt,
             gridcolor=grid_color ))
 
     st.plotly_chart(type_year, use_container_width=True)
+    ratingdf=df_filtered.groupby(['new','rating'])['show_id'].count().reset_index().sort_values(by=['rating','show_id'],ascending=[True,False])
+    ratingdf=ratingdf[ratingdf['new']!='Not identified'].sort_values(by='show_id',ascending=False).head(10)
+    ratingchartt=px.bar(data_frame=ratingdf,x='new',y='show_id',facet_col='rating',title='<b>Rating Per country top 10</b>',text_auto=True,color_discrete_sequence=['red']).update_layout(title={'x':0.2})
+    ratingchartt.update_xaxes(title='Country')
+    ratingchartt.update_yaxes(title='count')
+    st.plotly_chart(ratingchartt,use_container_width=True)
+
+
     #creating second page movies 
 if page == 'Movies':
     #creating base DF
